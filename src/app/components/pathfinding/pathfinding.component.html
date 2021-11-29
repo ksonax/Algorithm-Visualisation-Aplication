@@ -1,0 +1,21 @@
+<ul>
+    <li >
+        <input type="text" #box (keyup)="getSeedValue(box.value)" placeholder=" Ziarno dla generatora">
+    </li>
+    <li (click)="RandomLabirynth()">Generuj Labirynt</li>
+    <!--
+    <li>
+        <label for="algorithms">Wybierz algorytm: </label>
+        <select name="algorithms" id="algorithms">
+            <option value="Algorytm 1">Algorytm 1</option>
+            <option value="Algorytm 2">Algorytm 2</option>
+            <option value="Algorytm 3">Algorytm 3</option>
+            <option value="Algorytm 4">Algorytm 4</option>
+          </select>
+    </li>
+    <li >Wizualizuj</li>    
+    -->
+    <li (click)="resetGrid()" style="float:right"> Wyczyć Tablicę </li>
+</ul>
+<canvas id="myCanvas" width="1235" height="520">
+</canvas>

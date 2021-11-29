@@ -1,0 +1,11 @@
+<ul>
+    <li (click)="MakeSorting('merge')">Merge Sort</li>
+    <li (click)="MakeSorting('quick')">Quick Sort</li>
+    <li (click)="MakeSorting('bubble')">Bubble Sort</li>
+    <li (click)="MakeSorting('heap')">Heap Sort</li>
+    <li (click)="MakeSorting('re-define')" style="float:right">Wymieszaj Tablicę</li>
+    <li (click)="ChangeSize(slider.value)">
+        <input #slider type="range" min="10" value="150" max="150" style="background: white; cursor: po inter;">
+    </li>
+</ul>
+  

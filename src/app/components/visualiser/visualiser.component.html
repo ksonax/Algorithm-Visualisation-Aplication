@@ -1,0 +1,22 @@
+<app-sort-nav-bar></app-sort-nav-bar>
+<div class="array-container">
+    <div class="array-bar" *ngFor="let i of Array;" [ngStyle]="{'height': i+'px','background-color':PRIMARY_COLOR}">
+    </div>
+  </div>
+  
+  <div class="score" style="display: block;">
+    <table>
+        <h3 class="title">Dodatkowe Informacje:</h3>
+      <tr>
+        <th>Obecny Algorytm</th>
+        <th>Ilość Elementów</th>
+        <th>Liczba Zamian</th>
+      </tr>
+      <tr>
+        <td>{{CURRENT_ALGORITHM}}</td>
+        <td>{{BARS_AMOUNT}}</td>
+        <td>{{NUMBER_OF_SWAPS}}</td>
+      </tr>
+    </table>
+  </div>
+  

@@ -25,6 +25,7 @@ export class PathfindingComponent implements OnInit {
   nodeSize = 25;
   lineWidth = 0.05;
   seed = '';
+  seedrandom = require('seedrandom');
 
   nodes = new Array(75);; //2d array of square nodes // 75
   canvas!: HTMLCanvasElement;
@@ -187,7 +188,7 @@ export class PathfindingComponent implements OnInit {
         if (maxX - minX < 2) {
             return;
         }
-        var y = Math.floor(this.randomNumber(minY, maxY)/2)*2;
+        var y = Math.floor(this.randomNumber(minY, maxY, this.seed)/2)*2;
         this.addHWall(minX, maxX, y);
 
         this.addInnerWalls(!h, minX, maxX, minY, y-1);
@@ -197,7 +198,7 @@ export class PathfindingComponent implements OnInit {
             return;
         }
 
-        var x = Math.floor(this.randomNumber(minX, maxX)/2)*2;
+        var x = Math.floor(this.randomNumber(minX, maxX, this.seed)/2)*2;
         this.addVWall(minY, maxY, x);
 
         this.addInnerWalls(!h, minX, x-1, minY, maxY);
@@ -206,7 +207,7 @@ export class PathfindingComponent implements OnInit {
   }
   
   async addHWall(minX:any, maxX:any, y:any) {
-    var hole = Math.floor(this.randomNumber(minX, maxX)/2)*2+1;
+    var hole = Math.floor(this.randomNumber(minX, maxX, this.seed)/2)*2+1;
 
     for (var i = minX; i <= maxX; i++) {
         if (i == hole) {
@@ -220,7 +221,7 @@ export class PathfindingComponent implements OnInit {
     }
   }
   async addVWall(minY:any, maxY:any, x:any) {
-    var hole = Math.floor(this.randomNumber(minY, maxY)/2)*2+1;
+    var hole = Math.floor(this.randomNumber(minY, maxY, this.seed)/2)*2+1;
 
     for (var i = minY; i <= maxY; i++) {
         if (i == hole) {
@@ -234,8 +235,10 @@ export class PathfindingComponent implements OnInit {
         }  
     }
   }
-  randomNumber(min:any, max:any) {
-    return Math.floor(Math.random() * (max - min + 1) +min)
+  randomNumber(min:any, max:any, seed:any) {
+    var rand = this.seedrandom(this.seed += max + min);
+    console.log(Math.floor(rand() * (max - min + 1) + min));
+    return Math.floor(rand() * (max - min + 1) + min);
   }
   /*
   async fillMaze(){

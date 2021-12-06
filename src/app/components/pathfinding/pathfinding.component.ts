@@ -132,29 +132,22 @@ export class PathfindingComponent implements OnInit {
 
   async RandomLabirynth() {
     this.resetGrid();
-    var seedrandom = require('seedrandom');
-    var rand = seedrandom();
+    var rand = this.seedrandom();
     for (let i = 0; i < this.nodes.length; i++) {
       for (let j = 0; j < this.nodes[0].length; j++) {
 
         if (this.nodes[i][j].type != "Start" && this.nodes[i][j].type != "End") {
           
-          rand = seedrandom(this.seed += i + j)
+          rand = this.seedrandom(this.seed += i + j)
 
           if (rand() < 0.25) {
             this.ctxGrid.lineWidth = this.lineWidth;
             this.ctxGrid.fillStyle = this.nodeColor;
             this.nodes[i][j].type = "Wall";
-            /*
-            await new Promise<void>(resolve =>
-              setTimeout(() => {
-                resolve();
-              }, this.animationDelay)
-            );*/
+
             this.ctxGrid.fillRect(this.nodes[i][j].x + 0.5, this.nodes[i][j].y + 0.5, this.nodeSize - 1, this.nodeSize - 1);
 
           }
-          //console.log(this.nodes[i][j].type + "at i:" + i + "at j:" +j);
         }
       }
     }
@@ -172,11 +165,6 @@ export class PathfindingComponent implements OnInit {
         if (i == 0 || j == 0 || i == this.nodes.length - 1 || j == this.nodes[0].length - 1){
           this.nodes[i][j].type = "Wall";
           this.ctxGrid.fillRect(this.nodes[i][j].x + 0.5, this.nodes[i][j].y + 0.5, this.nodeSize - 1, this.nodeSize - 1);
-          /*await new Promise<void>(resolve =>
-            setTimeout(() => {
-              resolve();
-            }, this.animationDelay)
-          );*/
         }
       }
     }
@@ -240,26 +228,4 @@ export class PathfindingComponent implements OnInit {
     console.log(Math.floor(rand() * (max - min + 1) + min));
     return Math.floor(rand() * (max - min + 1) + min);
   }
-  /*
-  async fillMaze(){
-    for (let i = 0; i < this.nodes.length; i++) {
-      for (let j = 0; j < this.nodes[0].length; j++) {
-        if (this.nodes[i][j].type = "Wall") {
-          console.log(this.nodes[i][j].type + "at index [$1][$2]",i,j)
-          this.ctxGrid.fillRect(this.nodes[i][j].x + 0.5, this.nodes[i][j].y + 0.5, this.nodeSize - 1, this.nodeSize - 1);
-        }
-      }
-    }
-  }
-
-  addPassage(h:any){
-    if (h){
-      var rand = this.randomNumber(1, this.nodes.length -1);
-      this.ctxGrid.clearRect(this.nodes[this.nodes.length -1][rand].x + 0.5, this.nodes[this.nodes.length -1][rand].y + 0.5, this.nodeSize - 1, this.nodeSize - 1);
-    }else{
-      var rand = this.randomNumber(1, this.nodes[0].length -1);
-      this.ctxGrid.clearRect(this.nodes[rand][this.nodes.length -1].x + 0.5, this.nodes[rand][this.nodes.length -1].y + 0.5, this.nodeSize - 1, this.nodeSize - 1);
-    }
-  }
-  */
 }

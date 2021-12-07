@@ -2,7 +2,7 @@
     <li >
         <input type="text" #box (keyup)="getSeedValue(box.value)" placeholder=" Ziarno dla generatora">
     </li>
-    <li (click)="RandomLabirynth()">Generuj Labirynt</li>
+    <li (click)="RandomLabirynth()">Losowy Labirynt</li>
     <!--
     <li>
         <label for="algorithms">Wybierz algorytm: </label>
@@ -15,8 +15,9 @@
     </li>
     <li >Wizualizuj</li>    
     -->
+    <li (click)="dijkstraSearch_A_star_variation()"> Wizualizuj </li>
     <li (click)="resetGrid()" style="float:right"> Wyczyć Tablicę </li>
-    <li (click)="genRandomLabirynth()" style="float:right"> Test Labirynt </li>
+    <li (click)="genRandomLabirynth()" style="float:right"> Stwórz Labirynt </li>
 </ul>
 <canvas id="myCanvas" width="1235" height="520">
 </canvas>

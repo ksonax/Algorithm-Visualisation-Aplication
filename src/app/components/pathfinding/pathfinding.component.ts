@@ -7,6 +7,7 @@ import { catchError, retry } from 'rxjs/operators';
 import { seedrandom} from 'seedrandom'
 import * as internal from 'stream';
 import { Console } from 'console';
+import { cpuUsage } from 'process';
 
 @Component({
   selector: 'app-pathfinding',
@@ -22,17 +23,24 @@ export class PathfindingComponent implements OnInit {
   
   //variables
   seed = '';
+  seedSave = '';
   startNodeColor = "green";
   endNodeColor = "red";
   animationDelay = 0;
   nodeColor = "#909090";
-  nodeSize = 25;
   lineWidth = 0.05;
   seedrandom = require('seedrandom');
-  startNodePosition = 10;
-  endNodePosition = 20;
+  startNodePositionX = 1;
+  startNodePositionY = 1;
+  endNodePositionX = 73;
+  endNodePositionY = 29;
+  columns = 31;
+  rows = 75;
+  nodeSize = 25;
+  canvasHeight = this.nodeSize*this.columns;
+  canvasWidth = this.nodeSize*this.rows;
 
-  nodes = new Array(75);; //2d array of square nodes // 75
+  nodes = new Array(this.rows);; //2d array of square nodes // 75
   canvas!: HTMLCanvasElement;
   ctxGrid!: CanvasRenderingContext2D;
 
@@ -47,13 +55,13 @@ export class PathfindingComponent implements OnInit {
     
     //initialize array an grid
     for (let i = 0; i < this.nodes.length; i++) { 
-      this.nodes[i] = new Array(31);
+      this.nodes[i] = new Array(this.columns);
     }
     this.canvas = <HTMLCanvasElement>document.getElementById('myCanvas');
     this.ctxGrid = <CanvasRenderingContext2D>this.canvas.getContext('2d');
 
-    this.ctxGrid.canvas.height = 775;
-    this.ctxGrid.canvas.width = 1875;
+    this.ctxGrid.canvas.height = this.canvasHeight;
+    this.ctxGrid.canvas.width = this.canvasWidth;
     this.ctxGrid.canvas.style.imageRendering = 'auto';//default
     this.ctxGrid.translate(0.5, 0.5);
     this.ctxGrid.imageSmoothingEnabled = true;
@@ -70,6 +78,7 @@ export class PathfindingComponent implements OnInit {
 
   getSeedValue(seed:string) {
     this.seed = seed;
+    this.seedSave = seed;
   }
   //#TODO ADD Method for deleting walls and changing start and end nodes
   async draw_walls(e:any, cx:any, cy:any) {
@@ -119,6 +128,7 @@ export class PathfindingComponent implements OnInit {
     this.ctxGrid.lineWidth = this.lineWidth;
     //this.ctxGrid.fillStyle = this.nodeColor;
     this.ctxGrid.strokeStyle = this.nodeColor;
+    this.seed = this.seedSave;
         
     //grid with rectangles
     for (let i = 0; i < this.nodes.length; i++) {
@@ -136,7 +146,7 @@ export class PathfindingComponent implements OnInit {
         let cameFrom = undefined;
         let neighbors = new Array();
 
-        if (i == this.startNodePosition && j == this.startNodePosition) {
+        if (i == this.startNodePositionX && j == this.startNodePositionY) {
 
           this.ctxGrid.fillStyle = this.startNodeColor;
 
@@ -146,7 +156,7 @@ export class PathfindingComponent implements OnInit {
           this.ctxGrid.fillRect(x, y, this.nodeSize, this.nodeSize);
 
         } 
-        else if (i == this.endNodePosition && j == this.endNodePosition) {
+        else if (i == this.endNodePositionX && j == this.endNodePositionY) {
             this.ctxGrid.fillStyle = this.endNodeColor;
 
             type = "End"
@@ -206,13 +216,6 @@ export class PathfindingComponent implements OnInit {
         }
       }
     }
-    this.ctxGrid.fillStyle = this.startNodeColor;
-    this.nodes[10][10].type = "Start";
-    this.ctxGrid.fillRect(this.nodes[10][10].x, this.nodes[10][10].y, this.nodeSize, this.nodeSize);
-    this.ctxGrid.fillStyle = this.endNodeColor;
-    this.nodes[20][20].type = "End";
-    this.ctxGrid.fillRect(this.nodes[20][20].x, this.nodes[20][20].y, this.nodeSize, this.nodeSize);
-    this.ctxGrid.fillStyle = this.nodeColor;
   }
   
   async addInnerWalls(h:any, minX:any, maxX:any, minY:any, maxY:any) {
@@ -270,7 +273,6 @@ export class PathfindingComponent implements OnInit {
   }
   randomNumber(min:any, max:any, seed:any) {
     var rand = this.seedrandom(this.seed += max + min);
-    console.log(Math.floor(rand() * (max - min + 1) + min));
     return Math.floor(rand() * (max - min + 1) + min);
   }
 
@@ -324,7 +326,7 @@ export class PathfindingComponent implements OnInit {
       await new Promise<void>(resolve =>
         setTimeout(() => {
           resolve();
-        }, this.animationDelay)
+        }, this.animationDelay + 5)
       );
       this.ctxGrid.fillRect(xPos + x, yPos + y, dx, dy);
 
@@ -449,7 +451,7 @@ export class PathfindingComponent implements OnInit {
       for (let i = 0; i < closedSet.length; i++) {
         if (i == 0) {
           this.ctxGrid.fillStyle = this.startNodeColor;
-          this.ctxGrid.fillRect(this.nodes[this.startNodePosition][this.startNodePosition].x + 0.5, this.nodes[this.startNodePosition][this.startNodePosition].y + 0.5, this.nodeSize - 1, this.nodeSize - 1);
+          this.ctxGrid.fillRect(this.nodes[this.startNodePositionX][this.startNodePositionY].x + 0.5, this.nodes[this.startNodePositionX][this.startNodePositionY].y + 0.5, this.nodeSize - 1, this.nodeSize - 1);
         }else {
           this.ctxGrid.fillStyle = "#4287f5";
           this.ctxGrid.fillRect(closedSet[i].x + 0.5, closedSet[i].y + 0.5, this.nodeSize - 1, this.nodeSize - 1);

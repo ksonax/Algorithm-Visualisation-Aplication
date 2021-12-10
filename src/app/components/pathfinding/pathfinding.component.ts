@@ -6,6 +6,8 @@ import { catchError, retry } from 'rxjs/operators';
 // @ts-ignore
 import { seedrandom} from 'seedrandom'
 import * as internal from 'stream';
+import { Console } from 'console';
+import { cpuUsage } from 'process';
 
 @Component({
   selector: 'app-pathfinding',
@@ -19,15 +21,26 @@ export class PathfindingComponent implements OnInit {
 
   @ViewChild('canvas', { static: true })
   
-  //startNodeColor = "#FF3600";
+  //variables
+  seed = '';
+  seedSave = '';
+  startNodeColor = "green";
+  endNodeColor = "red";
   animationDelay = 0;
   nodeColor = "#909090";
-  nodeSize = 25;
   lineWidth = 0.05;
-  seed = '';
   seedrandom = require('seedrandom');
+  startNodePositionX = 1;
+  startNodePositionY = 1;
+  endNodePositionX = 73;
+  endNodePositionY = 29;
+  columns = 31;
+  rows = 75;
+  nodeSize = 25;
+  canvasHeight = this.nodeSize*this.columns;
+  canvasWidth = this.nodeSize*this.rows;
 
-  nodes = new Array(75);; //2d array of square nodes // 75
+  nodes = new Array(this.rows);; //2d array of square nodes // 75
   canvas!: HTMLCanvasElement;
   ctxGrid!: CanvasRenderingContext2D;
 
@@ -42,13 +55,13 @@ export class PathfindingComponent implements OnInit {
     
     //initialize array an grid
     for (let i = 0; i < this.nodes.length; i++) { 
-      this.nodes[i] = new Array(31);
+      this.nodes[i] = new Array(this.columns);
     }
     this.canvas = <HTMLCanvasElement>document.getElementById('myCanvas');
     this.ctxGrid = <CanvasRenderingContext2D>this.canvas.getContext('2d');
 
-    this.ctxGrid.canvas.height = 775;
-    this.ctxGrid.canvas.width = 1875;
+    this.ctxGrid.canvas.height = this.canvasHeight;
+    this.ctxGrid.canvas.width = this.canvasWidth;
     this.ctxGrid.canvas.style.imageRendering = 'auto';//default
     this.ctxGrid.translate(0.5, 0.5);
     this.ctxGrid.imageSmoothingEnabled = true;
@@ -62,9 +75,12 @@ export class PathfindingComponent implements OnInit {
     });
     this.resetGrid();
   }
+
   getSeedValue(seed:string) {
     this.seed = seed;
+    this.seedSave = seed;
   }
+  //#TODO ADD Method for deleting walls and changing start and end nodes
   async draw_walls(e:any, cx:any, cy:any) {
     //mouse pressed
     if (e.which == 1) {
@@ -75,7 +91,7 @@ export class PathfindingComponent implements OnInit {
 
           if ((cx < (this.nodes[i][j].x + this.nodeSize) && (cx > this.nodes[i][j].x) && (cy < (this.nodes[i][j].y + this.nodeSize)) && cy > (this.nodes[i][j].y))) {
             //make sure we are not building walls over walls
-            if (this.nodes[i][j].type != "Wall") {
+            if (this.nodes[i][j].type != "Wall" && this.nodes[i][j].type != "Start" && this.nodes[i][j].type != "End") {
               this.ctxGrid.lineWidth = this.lineWidth;
               this.ctxGrid.fillStyle = this.nodeColor;
               this.nodes[i][j].type = "Wall";
@@ -110,8 +126,9 @@ export class PathfindingComponent implements OnInit {
 
     this.ctxGrid.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.ctxGrid.lineWidth = this.lineWidth;
-    this.ctxGrid.fillStyle = this.nodeColor;
+    //this.ctxGrid.fillStyle = this.nodeColor;
     this.ctxGrid.strokeStyle = this.nodeColor;
+    this.seed = this.seedSave;
         
     //grid with rectangles
     for (let i = 0; i < this.nodes.length; i++) {
@@ -120,11 +137,41 @@ export class PathfindingComponent implements OnInit {
         let x = i * this.nodeSize;
         let y = j * this.nodeSize;
         var type = "";
+        let visited = false;
 
-        this.ctxGrid.fillStyle = this.nodeColor;
-        this.ctxGrid.strokeRect(x, y, this.nodeSize, this.nodeSize);
-        
-        this.nodes[i][j] = { x, y, i, j, type};  //x and y are grid coordinates, and i j is the index in array the square object is in
+        //G,H,F for A* algo
+        let F = 100000;
+        let G = 100000;
+        let H = 100000;
+        let cameFrom = undefined;
+        let neighbors = new Array();
+
+        if (i == this.startNodePositionX && j == this.startNodePositionY) {
+
+          this.ctxGrid.fillStyle = this.startNodeColor;
+
+          type = "Start"
+          //draw it
+          this.ctxGrid.strokeRect(x, y, this.nodeSize, this.nodeSize);
+          this.ctxGrid.fillRect(x, y, this.nodeSize, this.nodeSize);
+
+        } 
+        else if (i == this.endNodePositionX && j == this.endNodePositionY) {
+            this.ctxGrid.fillStyle = this.endNodeColor;
+
+            type = "End"
+            //draw it
+            this.ctxGrid.strokeRect(x, y, this.nodeSize, this.nodeSize);
+            this.ctxGrid.fillRect(x, y, this.nodeSize, this.nodeSize);
+        }
+        else {
+          this.ctxGrid.fillStyle = this.nodeColor;
+          type = "";
+          this.ctxGrid.strokeRect(x, y, this.nodeSize, this.nodeSize);
+          
+        }
+        this.nodes[i][j] = { x, y, i, j, type, F, G, H, neighbors, cameFrom, visited };  //x and y are grid coordinates, and i j is the index in array the square object is in
+
       }
     }
     
@@ -156,10 +203,11 @@ export class PathfindingComponent implements OnInit {
   async genRandomLabirynth(){
     this.resetGrid();
     this.addInnerWalls(true, 1, this.nodes[0].length - 2, 1, this.nodes.length - 2);
-    this.addOuterWalls();
+    this.addOuterWallsAndNodes();
+    
   }
   
-  async addOuterWalls() {
+  async addOuterWallsAndNodes() {
     for (let i = 0; i < this.nodes.length; i++) {
       for (let j = 0; j < this.nodes[0].length; j++) {
         if (i == 0 || j == 0 || i == this.nodes.length - 1 || j == this.nodes[0].length - 1){
@@ -225,7 +273,205 @@ export class PathfindingComponent implements OnInit {
   }
   randomNumber(min:any, max:any, seed:any) {
     var rand = this.seedrandom(this.seed += max + min);
-    console.log(Math.floor(rand() * (max - min + 1) + min));
     return Math.floor(rand() * (max - min + 1) + min);
+  }
+
+  findNeighbors() {
+    for (let i = 0; i < this.nodes.length; i++) {
+      for (let j = 0; j < this.nodes[0].length; j++) {
+        if (i < this.nodes.length - 1) {
+          this.nodes[i][j].neighbors.push(this.nodes[i + 1][j]);
+        }
+        if (i > 0) {
+          this.nodes[i][j].neighbors.push(this.nodes[i - 1][j]);
+        }
+        if (j < this.nodes[0].length - 1) {
+          this.nodes[i][j].neighbors.push(this.nodes[i][j + 1]);
+        }
+        if (j > 0) {
+          this.nodes[i][j].neighbors.push(this.nodes[i][j - 1]);
+        }
+
+      }
+    }
+  }
+  returnNeighbors(node:any) {
+
+    //let neighbors = [this.shapes[node.i][node.j - 1], this.shapes[node.i][node.j + 1], this.shapes[node.i - 1][node.j], this.shapes[node.i + 1][node.j]]
+
+    let neighbors = [];
+    if (node.i > 0) {
+      neighbors.push(this.nodes[node.i - 1][node.j]);
+    }
+    if (node.i < this.nodes.length - 1) [
+      neighbors.push(this.nodes[node.i + 1][node.j])
+    ]
+    if (node.j > 0) {
+      neighbors.push(this.nodes[node.i][node.j - 1]);
+    }
+    if (node.j < this.nodes[0].length - 1) {
+      neighbors.push(this.nodes[node.i][node.j + 1]);
+    }
+
+    return neighbors;
+  }
+  async drawNode(xPos:any, yPos:any, color:any) {
+    //a little delay animation for filling in the square
+    let x = this.nodeSize / 2;
+    let y = this.nodeSize / 2;
+    let dx = 0;
+    let dy = 0;
+
+    for (let k = this.nodeSize + 1; k > 0; k--) {
+      await new Promise<void>(resolve =>
+        setTimeout(() => {
+          resolve();
+        }, this.animationDelay + 5)
+      );
+      this.ctxGrid.fillRect(xPos + x, yPos + y, dx, dy);
+
+      x -= 0.5;
+      y -= 0.5;
+      dx += 1;
+      dy += 1;
+
+    }
+  }
+  removeFromArray(arr:any, element:any) {
+    for (let i = arr.length - 1; i >= 0; i--) {
+      if (arr[i] == element) {
+        arr.splice(i, 1);
+      }
+    }
+  }
+  heuristic(a:any, b:any) {
+    let d = (Math.abs(a.x - b.x) + Math.abs(a.y - b.y));
+    //let d = (Math.pow(b.x - a.x, 2) + Math.pow(b.y - a.y, 2));
+    return d;
+  }
+  //ALGO
+  async dijkstraSearch_A_star_variation() {
+
+    this.disableButtons = true;
+    let openSet = [];
+    let closedSet = [];
+    let start, end;
+    let path = [];
+
+
+    this.findNeighbors();
+
+
+    //shapes is a 2d array of squares... a grid
+    for (let i = 0; i < this.nodes.length; i++) {
+      for (let j = 0; j < this.nodes[0].length; j++) {
+        if (this.nodes[i][j].type == "Start") {
+          start = this.nodes[i][j];
+        }
+        if (this.nodes[i][j].type == "End") {
+          end = this.nodes[i][j];
+        }
+      }
+    }
+
+    openSet.push(start);
+
+
+    while (openSet.length > 0) {
+
+      let lowestIndex = 0;
+      //find lowest index
+      for (let i = 0; i < openSet.length; i++) {
+        if (openSet[i].F < openSet[lowestIndex].F)
+          lowestIndex = i;
+      }
+      //current node
+      let current:any = openSet[lowestIndex];
+
+      //if reached the end
+      if (openSet[lowestIndex] === end) {
+
+        path = [];
+        let temp = current;
+        path.push(temp);
+        while (temp.cameFrom) {
+          path.push(temp.cameFrom);
+          temp = temp.cameFrom;
+        }
+        console.log("Done!");
+        //draw path
+        for (let i = path.length - 1; i >= 0; i--) {
+          this.ctxGrid.fillStyle = "YELLOW";
+          this.ctxGrid.lineWidth = this.lineWidth;
+          this.drawNode(path[i].x, path[i].y, "YELLOW")
+          await new Promise<void>(resolve =>
+            setTimeout(() => {
+              resolve();
+            }, this.animationDelay)
+          );
+        }
+        this.disableButtons = false;
+        break;
+      }
+
+      this.removeFromArray(openSet, current);
+      closedSet.push(current);
+
+      let my_neighbors = current.neighbors;
+      for (let i = 0; i < my_neighbors.length; i++) {
+        var neighbor = my_neighbors[i];
+
+        if (!closedSet.includes(neighbor) && neighbor.type != "Wall") {
+          let tempG = current.G + 1;
+
+          let newPath = false;
+          if (openSet.includes(neighbor)) {
+            if (tempG < neighbor.G) {
+              neighbor.G = tempG;
+              newPath = true;
+            }
+          } else {
+            neighbor.G = tempG;
+            newPath = true;
+            openSet.push(neighbor);
+          }
+
+          if (newPath) {
+            neighbor.H = this.heuristic(neighbor, end);
+            neighbor.G = neighbor.F + neighbor.H;
+            neighbor.cameFrom = current;
+          }
+
+        }
+      }
+
+
+      //draw
+      this.ctxGrid.lineWidth = this.lineWidth;
+      for (let i = 0; i < closedSet.length; i++) {
+        if (i == 0) {
+          this.ctxGrid.fillStyle = this.startNodeColor;
+          this.ctxGrid.fillRect(this.nodes[this.startNodePositionX][this.startNodePositionY].x + 0.5, this.nodes[this.startNodePositionX][this.startNodePositionY].y + 0.5, this.nodeSize - 1, this.nodeSize - 1);
+        }else {
+          this.ctxGrid.fillStyle = "#4287f5";
+          this.ctxGrid.fillRect(closedSet[i].x + 0.5, closedSet[i].y + 0.5, this.nodeSize - 1, this.nodeSize - 1);
+        }
+      }
+      for (let i = 0; i < openSet.length; i++) {
+        this.ctxGrid.fillStyle = "#00c48d";
+        this.ctxGrid.fillRect(openSet[i].x + 0.5, openSet[i].y + 0.5, this.nodeSize - 1, this.nodeSize - 1);
+
+      }
+      await new Promise<void>(resolve =>
+        setTimeout(() => {
+          resolve();
+        }, this.animationDelay)
+      );
+    }
+    if (openSet.length <= 0) {
+      //no solution
+      console.log("NO SOLUTION");
+    }
+
   }
 }

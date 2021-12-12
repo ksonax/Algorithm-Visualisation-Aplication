@@ -8,6 +8,7 @@ import { seedrandom} from 'seedrandom'
 import * as internal from 'stream';
 import { Console } from 'console';
 import { cpuUsage } from 'process';
+import { Queue } from 'src/app/queue/queue';
 
 @Component({
   selector: 'app-pathfinding',
@@ -472,6 +473,200 @@ export class PathfindingComponent implements OnInit {
       //no solution
       console.log("NO SOLUTION");
     }
+
+  }
+  async a_star_search() {
+    this.disableButtons = true;
+    let openSet = [];
+    let closedSet = [];
+    let start, end;
+    let path = [];
+
+
+    this.findNeighbors();
+
+
+    //shapes is a 2d array of squares... a grid
+    for (let i = 0; i < this.nodes.length; i++) {
+      for (let j = 0; j < this.nodes[0].length; j++) {
+        if (this.nodes[i][j].type == "Start") {
+          start = this.nodes[i][j];
+        }
+        if (this.nodes[i][j].type == "End") {
+          end = this.nodes[i][j];
+        }
+      }
+    }
+
+    openSet.push(start);
+
+
+    while (openSet.length > 0) {
+
+      let lowestIndex = 0;
+      //find lowest index
+      for (let i = 0; i < openSet.length; i++) {
+        if (openSet[i].F < openSet[lowestIndex].F)
+          lowestIndex = i;
+        else if (openSet[i].F === openSet[lowestIndex].F) {
+          if (openSet[i].H < openSet[lowestIndex].H) {
+            lowestIndex = i;
+          }
+        }
+      }
+      //current node
+      let current:any = openSet[lowestIndex];
+
+      //if reached the end
+      if (openSet[lowestIndex] === end) {
+
+        path = [];
+        let temp = current;
+        path.push(temp);
+        while (temp.cameFrom) {
+          path.push(temp.cameFrom);
+          temp = temp.cameFrom;
+        }
+        console.log("Done!"); // DONE
+        //draw path
+        for (let i = path.length - 1; i >= 0; i--) {
+          this.ctxGrid.fillStyle = "#ffff00";
+          this.ctxGrid.lineWidth = this.lineWidth;
+          this.drawNode(path[i].x, path[i].y, "#ffff00")
+          await new Promise<void>(resolve =>
+            setTimeout(() => {
+              resolve();
+            }, this.animationDelay)
+          );
+        }
+        this.disableButtons = false;
+        break;
+      }
+
+      this.removeFromArray(openSet, current);
+      closedSet.push(current);
+
+      let my_neighbors = current.neighbors;
+      for (let i = 0; i < my_neighbors.length; i++) {
+        var neighbor = my_neighbors[i];
+
+        if (!closedSet.includes(neighbor) && neighbor.type != "Wall") {
+          let tempG = current.G + 1;
+
+          let newPath = false;
+          if (openSet.includes(neighbor)) {
+            if (tempG < neighbor.G) {
+              neighbor.G = tempG;
+              newPath = true;
+            }
+          } else {
+            neighbor.G = tempG;
+            newPath = true;
+            openSet.push(neighbor);
+          }
+
+          if (newPath) {
+            neighbor.H = this.heuristic(neighbor, end);
+            neighbor.F = neighbor.G + neighbor.H;
+            neighbor.cameFrom = current;
+          }
+
+        }
+      }
+
+
+      //draw
+      this.ctxGrid.lineWidth = this.lineWidth;
+      for (let i = 0; i < closedSet.length; i++) { //BLUE
+        this.ctxGrid.fillStyle = "#4287f5";
+        this.ctxGrid.fillRect(closedSet[i].x + 0.5, closedSet[i].y + 0.5, this.nodeSize - 1, this.nodeSize - 1);
+        //this.drawNode(closedSet[i].x, closedSet[i].y, "#4287f5");
+      }
+      for (let i = 0; i < openSet.length; i++) { //GREEN
+        this.ctxGrid.fillStyle = "#00c48d";
+        this.ctxGrid.fillRect(openSet[i].x + 0.5, openSet[i].y + 0.5, this.nodeSize - 1, this.nodeSize - 1);
+        //this.drawNode(closedSet[i].x, closedSet[i].y, "#00c48d");
+
+      }
+      await new Promise<void>(resolve =>
+        setTimeout(() => {
+          resolve();
+        }, this.animationDelay)
+      );
+    }
+    if (openSet.length <= 0) {
+      //no solution
+      this.disableButtons = false;
+    }
+
+  }
+  async bfs_Search() {
+    //this.clearSearchNotWalls();
+    this.disableButtons = true;
+
+    let start;
+    let end;
+    for (let i = 0; i < this.nodes.length; i++) {
+      for (let j = 0; j < this.nodes[0].length; j++) {
+        if (this.nodes[i][j].type == "Start") {
+          start = this.nodes[i][j];
+        }
+        if (this.nodes[i][j].type == "End") {
+          end = this.nodes[i][j];
+        }
+      }
+    }
+
+    console.log(end.i + " " + end.j);
+
+    let queue = new Queue();
+    queue.enqueue(start);
+
+    while (!queue.isEmpty()) {
+      let node = queue.dequeue();
+
+      if (node == end) {
+        let current = end;
+        let path = new Array();
+        while (current != start) {
+          current = current.cameFrom;
+          path.push(current);
+        }
+        for (let i = path.length - 1; i >= 0; i--) {
+          this.ctxGrid.fillStyle = "#ffff00";
+          this.ctxGrid.lineWidth = this.lineWidth;
+          this.drawNode(path[i].x, path[i].y, "#ffff00")
+          await new Promise<void>(resolve =>
+            setTimeout(() => {
+              resolve();
+            }, this.animationDelay)
+          );
+        }
+        this.disableButtons = false;
+        break;
+      }
+
+      let neighbors = this.returnNeighbors(node);
+
+      for (let i = 0; i < neighbors.length; i++) {
+        if (!neighbors[i].visited && neighbors[i].type != "Wall") {
+          neighbors[i].visited = true;
+          neighbors[i].cameFrom = node;
+          queue.enqueue(neighbors[i]);
+          this.ctxGrid.fillStyle = "#4287f5";
+          this.ctxGrid.fillRect(neighbors[i].x + 0.5, neighbors[i].y + 0.5, this.nodeSize - 1, this.nodeSize - 1);
+        }
+      }
+      await new Promise<void>(resolve =>
+        setTimeout(() => {
+          resolve();
+        }, this.animationDelay)
+      );
+    }
+
+
+
+
 
   }
 }

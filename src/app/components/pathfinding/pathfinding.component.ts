@@ -127,7 +127,7 @@ export class PathfindingComponent implements OnInit {
 
     this.ctxGrid.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.ctxGrid.lineWidth = this.lineWidth;
-    //this.ctxGrid.fillStyle = this.nodeColor;
+    this.ctxGrid.fillStyle = this.nodeColor;
     this.ctxGrid.strokeStyle = this.nodeColor;
     this.seed = this.seedSave;
         
@@ -177,7 +177,40 @@ export class PathfindingComponent implements OnInit {
     }
     
   }
-
+  async setStartEndNodes(node: string){
+    if (node == "Start"){
+      this.ctxGrid.fillStyle = this.startNodeColor;
+      this.nodes[this.startNodePositionX][this.startNodePositionY].type = "Start"
+      this.ctxGrid.strokeRect(this.nodes[this.startNodePositionX][this.startNodePositionY].x, this.nodes[this.startNodePositionX][this.startNodePositionY].y, this.nodeSize, this.nodeSize);
+      this.ctxGrid.fillRect(this.nodes[this.startNodePositionX][this.startNodePositionY].x, this.nodes[this.startNodePositionX][this.startNodePositionY].y, this.nodeSize, this.nodeSize);
+    }
+    else if (node == "End"){
+      this.ctxGrid.fillStyle = this.endNodeColor;
+      this.nodes[this.endNodePositionX][this.endNodePositionY].type = "End"
+      this.ctxGrid.strokeRect(this.nodes[this.endNodePositionX][this.endNodePositionY].x, this.nodes[this.endNodePositionX][this.endNodePositionY].y, this.nodeSize, this.nodeSize);
+      this.ctxGrid.fillRect(this.nodes[this.endNodePositionX][this.endNodePositionY].x, this.nodes[this.endNodePositionX][this.endNodePositionY].y, this.nodeSize, this.nodeSize);
+    }
+  }
+  async clearPath(){
+    this.ctxGrid.lineWidth = this.lineWidth;
+    this.ctxGrid.strokeStyle = this.nodeColor;
+    for (let i = 0; i < this.nodes.length; i++) {
+      for (let j = 0; j < this.nodes[0].length; j++) {
+        if(this.nodes[i][j].type != 'Wall' && this.nodes[i][j].type != 'Start' && this.nodes[i][j].type != 'End'){
+          this.nodes[i][j].type = '';
+           this.ctxGrid.clearRect(this.nodes[i][j].x, this.nodes[i][j].y, this.nodeSize, this.nodeSize);
+          this.ctxGrid.strokeRect(this.nodes[i][j].x, this.nodes[i][j].y, this.nodeSize, this.nodeSize);
+      }
+      this.nodes[i][j].visited = false;
+      this.nodes[i][j].cameFrom = undefined;
+      this.nodes[i][j].F = 0;
+      this.nodes[i][j].G = 0;
+      this.nodes[i][j].H = 0;
+    }
+    }
+    this.setStartEndNodes("Start");
+    this.setStartEndNodes("End");
+  }
   async RandomLabirynth() {
     this.resetGrid();
     var rand = this.seedrandom();
@@ -298,8 +331,6 @@ export class PathfindingComponent implements OnInit {
   }
   returnNeighbors(node:any) {
 
-    //let neighbors = [this.shapes[node.i][node.j - 1], this.shapes[node.i][node.j + 1], this.shapes[node.i - 1][node.j], this.shapes[node.i + 1][node.j]]
-
     let neighbors = [];
     if (node.i > 0) {
       neighbors.push(this.nodes[node.i - 1][node.j]);
@@ -323,7 +354,7 @@ export class PathfindingComponent implements OnInit {
     let dx = 0;
     let dy = 0;
 
-    for (let k = this.nodeSize + 1; k > 0; k--) {
+    for (let k = this.nodeSize+1; k > 0; k--) {
       await new Promise<void>(resolve =>
         setTimeout(() => {
           resolve();
@@ -347,12 +378,11 @@ export class PathfindingComponent implements OnInit {
   }
   heuristic(a:any, b:any) {
     let d = (Math.abs(a.x - b.x) + Math.abs(a.y - b.y));
-    //let d = (Math.pow(b.x - a.x, 2) + Math.pow(b.y - a.y, 2));
     return d;
   }
   //ALGO
   async dijkstraSearch_A_star_variation() {
-
+    this.clearPath();
     this.disableButtons = true;
     let openSet = [];
     let closedSet = [];
@@ -362,8 +392,7 @@ export class PathfindingComponent implements OnInit {
 
     this.findNeighbors();
 
-
-    //shapes is a 2d array of squares... a grid
+    //nodes is a 2d array of squares
     for (let i = 0; i < this.nodes.length; i++) {
       for (let j = 0; j < this.nodes[0].length; j++) {
         if (this.nodes[i][j].type == "Start") {
@@ -376,7 +405,6 @@ export class PathfindingComponent implements OnInit {
     }
 
     openSet.push(start);
-
 
     while (openSet.length > 0) {
 
@@ -476,6 +504,7 @@ export class PathfindingComponent implements OnInit {
 
   }
   async a_star_search() {
+    this.clearPath();
     this.disableButtons = true;
     let openSet = [];
     let closedSet = [];
@@ -499,7 +528,6 @@ export class PathfindingComponent implements OnInit {
     }
 
     openSet.push(start);
-
 
     while (openSet.length > 0) {
 
@@ -601,7 +629,7 @@ export class PathfindingComponent implements OnInit {
 
   }
   async bfs_Search() {
-    //this.clearSearchNotWalls();
+    this.clearPath();
     this.disableButtons = true;
 
     let start;
@@ -663,10 +691,5 @@ export class PathfindingComponent implements OnInit {
         }, this.animationDelay)
       );
     }
-
-
-
-
-
   }
 }

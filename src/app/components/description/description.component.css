@@ -1,0 +1,33 @@
+p {
+    font-size: 1em;
+    color: white;
+}
+h1 {
+    color: #af4c4c;
+    padding-bottom: 15px;
+}
+.container{
+    padding: 25px;
+    margin-top: 25px;
+    margin-bottom: 25px;
+    background-color: #333333;
+    border: solid 2px #909090;
+    border-radius: 25px;
+    width: 100%;
+}
+pre {
+    background: #333333;
+    border: 1px solid #909090;
+    border-radius: 25px;
+    color: white;
+    page-break-inside: avoid;
+    font-family: monospace;
+    font-size: 1em;
+    line-height: 1.6;
+    margin-bottom: 1.6em;
+    max-width: 100%;
+    overflow: auto;
+    padding: 1em 1.5em;
+    display: block;
+    word-wrap: break-word;
+  }

@@ -13,6 +13,7 @@ import { PathfindingNavBarComponent } from './components/pathfinding-nav-bar/pat
 import { HomeComponent } from './components/home/home.component';
 import { HttpClientModule } from '@angular/common/http';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { DescriptionComponent } from './components/description/description.component';
 
 const appRoutes: Routes = [
   {path: '', component: PathfindingComponent},
@@ -29,7 +30,8 @@ const appRoutes: Routes = [
     FooterComponent,
     PathfindingComponent,
     PathfindingNavBarComponent,
-    HomeComponent
+    HomeComponent,
+    DescriptionComponent
   ],
   imports: [
     BrowserModule,

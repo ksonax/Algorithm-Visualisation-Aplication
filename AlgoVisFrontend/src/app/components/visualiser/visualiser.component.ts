@@ -9,7 +9,8 @@ import { getAnimationsForQuickSort } from 'src/app/algorithms/quickSort.js';
 import { getAnimationsForBubbleSort } from 'src/app/algorithms/bubbleSort.js';
 // @ts-ignore
 import { getAnimationsForHeapSort } from 'src/app/algorithms/heapSort.js';
-
+// @ts-ignore
+import { getAnimationsForInsertionSort } from 'src/app/algorithms/insertionSort.js';
 
 @Component({
   selector: 'app-visualiser',
@@ -59,6 +60,11 @@ export class VisualiserComponent implements OnInit {
         case "Heap Sort":{
           this.CURRENT_ALGORITHM = "HEAP SORT";
           this.heapSort();
+          break;
+        }
+        case "Insertion Sort":{
+          this.CURRENT_ALGORITHM = "INSERTION SORT";
+          this.insertionSort();
           break;
         }
       }
@@ -170,6 +176,47 @@ export class VisualiserComponent implements OnInit {
    bubbleSort()
    {
       let animations = getAnimationsForBubbleSort(this.Array);
+      let arrayBars = document.getElementsByClassName('array-bar');
+
+      for(let i = 0; i< animations.length; i++)
+      {
+        const [check,v1,v2,v3,v4] = animations[i].slice();
+        if(check === "HighLightOn")
+        {
+          let barOneStyle = <HTMLElement>arrayBars[v1];
+          let barTwoStyle = <HTMLElement>arrayBars[v2];
+
+          setTimeout(() => {
+            barOneStyle.style.backgroundColor = this.SECONDARY_COLOR;
+            barTwoStyle.style.backgroundColor = this.SECONDARY_COLOR;
+           }, i * this.ANIMATION_SPEED);
+        }
+        else if(check === "HighLightOff")
+        {
+          let barOneStyle = <HTMLElement>arrayBars[v1];
+          let barTwoStyle = <HTMLElement>arrayBars[v2];
+
+          setTimeout(() => {
+            barOneStyle.style.backgroundColor = this.PRIMARY_COLOR;
+            barTwoStyle.style.backgroundColor = this.PRIMARY_COLOR;
+           }, i * this.ANIMATION_SPEED);
+        }
+        else if(check === "Swap")
+        {
+          let barOneStyle = <HTMLElement>arrayBars[v1];
+          let barTwoStyle = <HTMLElement>arrayBars[v3];
+
+          setTimeout(() => {
+            barOneStyle.style.height = `${v2}px`;
+            barTwoStyle.style.height = `${v4}px`;
+            this.NUMBER_OF_SWAPS++;
+           }, i * this.ANIMATION_SPEED);
+        }
+      }
+   }
+   insertionSort()
+   {
+      let animations = getAnimationsForInsertionSort(this.Array);
       let arrayBars = document.getElementsByClassName('array-bar');
 
       for(let i = 0; i< animations.length; i++)

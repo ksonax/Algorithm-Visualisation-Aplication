@@ -9,6 +9,7 @@ import * as internal from 'stream';
 import { Console } from 'console';
 import { cpuUsage } from 'process';
 import { Queue } from 'src/app/queue/queue';
+import { AlgorithmsService } from 'src/app/services/algorithms.service';
 
 @Component({
   selector: 'app-pathfinding',
@@ -16,8 +17,9 @@ import { Queue } from 'src/app/queue/queue';
   styleUrls: ['./pathfinding.component.css']
 })
 export class PathfindingComponent implements OnInit {
-
-  constructor() {
+  selected: string = 'A*';
+  constructor(private chosenAlgo: AlgorithmsService) {
+    
   }
 
   @ViewChild('canvas', { static: true })
@@ -72,7 +74,7 @@ export class PathfindingComponent implements OnInit {
       const rect = this.canvas.getBoundingClientRect();
       let cx = e.clientX - rect.left;
       let cy = e.clientY - rect.top;
-      this.draw_walls(e, cx, cy);
+      this.drawWalls(e, cx, cy);
     });
     this.resetGrid();
   }
@@ -82,16 +84,15 @@ export class PathfindingComponent implements OnInit {
     this.seedSave = seed;
   }
   //#TODO ADD Method for deleting walls and changing start and end nodes
-  async draw_walls(e:any, cx:any, cy:any) {
-    //mouse pressed
-    if (e.which == 1) {
-      //find out which square object is this
-      for (let i = 0; i < this.nodes.length; i++) {
+  async drawWalls(e:any, cx:any, cy:any) {
 
+    if (e.which == 1) {
+
+      for (let i = 0; i < this.nodes.length; i++) {
         for (let j = 0; j < this.nodes[i].length; j++) {
 
           if ((cx < (this.nodes[i][j].x + this.nodeSize) && (cx > this.nodes[i][j].x) && (cy < (this.nodes[i][j].y + this.nodeSize)) && cy > (this.nodes[i][j].y))) {
-            //make sure we are not building walls over walls
+
             if (this.nodes[i][j].type != "Wall" && this.nodes[i][j].type != "Start" && this.nodes[i][j].type != "End") {
               this.ctxGrid.lineWidth = this.lineWidth;
               this.ctxGrid.fillStyle = this.nodeColor;
@@ -101,7 +102,7 @@ export class PathfindingComponent implements OnInit {
               let y = this.nodeSize / 2;
               let dx = 0;
               let dy = 0;
-              //animation
+
               for (let k = this.nodeSize / 2; k > 0; k--) {
                 await new Promise<void>(resolve =>
                   setTimeout(() => {
@@ -109,7 +110,6 @@ export class PathfindingComponent implements OnInit {
                   }, this.animationDelay)
                 );
                 this.ctxGrid.fillRect(this.nodes[i][j].x + x, this.nodes[i][j].y + y, dx - 0.1, dy - 0.1);
-                console.log("x: "+ i + "y: " +j);
                 x--;
                 y--;
                 dx += 2;
@@ -348,7 +348,6 @@ export class PathfindingComponent implements OnInit {
     return neighbors;
   }
   async drawNode(xPos:any, yPos:any, color:any) {
-    //a little delay animation for filling in the square
     let x = this.nodeSize / 2;
     let y = this.nodeSize / 2;
     let dx = 0;
@@ -691,5 +690,26 @@ export class PathfindingComponent implements OnInit {
         }, this.animationDelay)
       );
     }
+  }
+  async visualise(algo: string){
+    switch(algo) {
+      case 'A*':{
+        this.a_star_search();
+        break;
+      }
+      case 'BFS':{
+        this.bfs_Search();
+        break;
+      }
+      case 'Dijkstra':{
+        this.dijkstraSearch_A_star_variation();
+        break;
+      }
+      default:
+        console.log(this.selected);
+    }
+  }
+  chooseAlgo(selected:any){
+    this.chosenAlgo.getSelectedAlgorithm(selected);
   }
 }

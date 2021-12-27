@@ -33,29 +33,30 @@ export class VisualiserComponent implements OnInit {
   
   constructor(private eventService:EventsService) { 
     this.resetArray();
-    this.clickEventSubscription = this.eventService.getClickEvent().subscribe((shortType)=>{
+    this.clickEventSubscription = this.eventService.getClickEvent()
+    .subscribe((shortType)=>{
       this.NUMBER_OF_SWAPS = 0;
       switch(shortType){
         case "re-define":{
           this.resetArray();
           break;
         }
-        case "merge":{
+        case "Merge Sort":{
           this.CURRENT_ALGORITHM = "MERGE SORT";
           this.mergSort();
           break;
         }
-        case "quick":{
+        case "Quick Sort":{
           this.CURRENT_ALGORITHM = "QUICK SORT";
           this.quickSort();
           break;
         }
-        case "bubble":{
+        case "Bubble Sort":{
           this.CURRENT_ALGORITHM = "BUBBLE SORT";
           this.bubbleSort();
           break;
         }
-        case "heap":{
+        case "Heap Sort":{
           this.CURRENT_ALGORITHM = "HEAP SORT";
           this.heapSort();
           break;

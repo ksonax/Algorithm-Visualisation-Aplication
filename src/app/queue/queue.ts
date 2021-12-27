@@ -5,28 +5,28 @@ export class Queue {
     constructor() {
         this.items = [];
     }
-
+    // adding element to the queue 
     enqueue(element:any) {
-        // adding element to the queue 
+ 
         this.items.push(element);
     }
+    // removing element from the queue 
+    //returns underflow when called  
+    // on empty queue 
     dequeue() {
-        // removing element from the queue 
-        // returns underflow when called  
-        // on empty queue 
         if (this.isEmpty())
             return "Underflow";
         return this.items.shift();
     }
+    // returns the Front element of  
+    // the queue without removing it. 
     front() {
-        // returns the Front element of  
-        // the queue without removing it. 
         if (this.isEmpty())
             return "No elements in Queue";
         return this.items[0];
     }
+    // return true if the queue is empty. 
     isEmpty() {
-        // return true if the queue is empty. 
         return this.items.length == 0;
     }
     printQueue() {

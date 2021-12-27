@@ -14,6 +14,9 @@ import { HomeComponent } from './components/home/home.component';
 import { HttpClientModule } from '@angular/common/http';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { DescriptionComponent } from './components/description/description.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatSelectModule } from '@angular/material/select';
+
 
 const appRoutes: Routes = [
   {path: '', component: PathfindingComponent},
@@ -38,7 +41,9 @@ const appRoutes: Routes = [
     AppRoutingModule,
     HttpClientModule,
     RouterModule.forRoot(appRoutes),
-    NgbModule
+    NgbModule,
+    BrowserAnimationsModule,
+    MatSelectModule
   ],
   providers: [],
   bootstrap: [AppComponent]

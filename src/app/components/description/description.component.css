@@ -13,7 +13,8 @@ h1 {
     background-color: #333333;
     border: solid 2px #909090;
     border-radius: 25px;
-    width: 100%;
+    width: 40%;
+    line-height: 1.6em;
 }
 pre {
     background: #333333;
@@ -30,4 +31,4 @@ pre {
     padding: 1em 1.5em;
     display: block;
     word-wrap: break-word;
-  }
+}

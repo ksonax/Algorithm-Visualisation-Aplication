@@ -4,11 +4,19 @@
     </li>
     <li (click)="RandomLabirynth()">Losowy Labirynt</li>
     <li (click)="genRandomLabirynth()"> Stwórz Labirynt</li>
-    <li (click)="dijkstraSearch_A_star_variation()"> Wizualizuj Dijkstra</li>
-    <li (click)="bfs_Search()"> Wizualizuj BFS</li>
-    <li (click)="a_star_search()"> Wizualizuj A*</li>
     <li (click)="clearPath()" style="float:right"> Wyczyć Ścieżkę </li>
     <li (click)="resetGrid()" style="float:right"> Wyczyć Tablicę </li>
+    <li (click)="visualise(selected)" style="float:right">Wizualizuj</li>
+    <form>
+    <mat-form-field appearance="fill">
+        <mat-label>Wybierz algorytm</mat-label>
+        <mat-select [(value)]="selected">
+          <mat-option (click)="chooseAlgo(selected)" value="Dijkstra">Dijkstra</mat-option>
+          <mat-option (click)="chooseAlgo(selected)" value="BFS">BFS</mat-option>
+          <mat-option (click)="chooseAlgo(selected)" value="A*">A*</mat-option>
+        </mat-select>
+      </mat-form-field>  
+    </form>
 </ul>
-<canvas id="myCanvas" width="1235" height="520">
+<canvas id="myCanvas">
 </canvas>

@@ -1,11 +1,18 @@
 <ul>
-    <li (click)="MakeSorting('merge')">Merge Sort</li>
-    <li (click)="MakeSorting('quick')">Quick Sort</li>
-    <li (click)="MakeSorting('bubble')">Bubble Sort</li>
-    <li (click)="MakeSorting('heap')">Heap Sort</li>
-    <li (click)="MakeSorting('re-define')" style="float:right">Wymieszaj Tablicę</li>
     <li (click)="ChangeSize(slider.value)">
         <input #slider type="range" min="10" value="150" max="150" style="background: white; cursor: po inter;">
     </li>
+    <mat-form-field appearance="fill">
+        <mat-label>Wybierz algorytm</mat-label>
+        <mat-select [(value)]="selected">
+            <mat-option (click)="chooseAlgo(selected)" value="Merge Sort">Merge Sort</mat-option>
+            <mat-option (click)="chooseAlgo(selected)" value="Quick Sort">Quick Sort</mat-option>
+            <mat-option (click)="chooseAlgo(selected)" value="Bubble Sort">Bubble Sort</mat-option>
+            <mat-option (click)="chooseAlgo(selected)" value="Heap Sort">Heap Sort</mat-option>
+        </mat-select>
+    </mat-form-field>
+    <li (click)="MakeSorting('re-define')" style="float:right">Wymieszaj Tablicę</li>
+    <li (click)="MakeSorting(selected)" style="float:right">Wizualizuj</li>
+
 </ul>
   

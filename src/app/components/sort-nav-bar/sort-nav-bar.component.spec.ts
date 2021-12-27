@@ -1,3 +1,4 @@
+import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SortNavBarComponent } from './sort-nav-bar.component';
@@ -8,7 +9,8 @@ describe('SortNavBarComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SortNavBarComponent ]
+      declarations: [ SortNavBarComponent ],
+      imports: [HttpClientModule]
     })
     .compileComponents();
   });

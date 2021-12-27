@@ -1,15 +1,11 @@
-<div class="container">
-    <h1>Algorytm A*</h1>
+<ng-container *ngFor="let algo of service.algorithmsList">
+<div class="container"  *ngIf="currentAlgo == algo.algorithmName">
+    <h1 >Algorytm: {{algo.algorithmName}}</h1>
     <div>
-        <p>Jest to jeden z najbardziej popularnych algorytmów odnajdywania ścieżki. Algorytm ten jest powszechnie używany między innymi w grach komputerowych. Zadaniem tego algorytmu jest jak najszybsze znalezienie drogi pomiędzy punktem startowym a docelowym. Posiada on trzy parametry: 
-            <br>	g: Koszt przemieszczenia się z punktu startowego do obecnego, przedstawiony jako suma dotychczasowych punktów odwiedzonych przez algorytm.
-            <br>	h: Znane również jako wartość heurystyczna, jest to szacowany koszt przejścia z obecnej komórki do komórki końcowej. Koszt rzeczywisty nie zostaje wyliczony do momentu dotarcia do komórki końcowej.
-            <br>	f: To suma parametrów g oraz h.
-            Podczas działania algorytmu podejmuje on decyzję biorąc pod uwagę wartość parametru f. Wybiera on komórkę, w której jego wartość jest najniższa i do niej się przemieszcza. Proces ten powtarza się, dopóki algorytm nie osiągnie swojego celu.
-        </p>
+        <p [innerHTML]="algo.description"></p>
     </div>
 </div>
-<div class="container code">
+<div class="container code"  *ngIf="currentAlgo == algo.algorithmName">
 <h1>Przykładowa implenetacja</h1>
 <pre>
 <code>
@@ -37,3 +33,16 @@ bubbleSort(arr)
 </pre>
 
 </div>
+</ng-container>
+<!--
+<div class="col-md-6">
+    <ng-container *ngFor="let algo of service.algorithmsList">
+    <tr *ngIf="currentAlgo == algo.algorithmName">
+        <th>{{algo.algorithmName}}</th>
+        <th>{{algo.description}}</th>
+        <th>{{algo.javaScriptImplementation}}</th>
+        <th>{{algo.algorithmId}}</th>
+    </tr>
+    </ng-container>
+</div>
+-->

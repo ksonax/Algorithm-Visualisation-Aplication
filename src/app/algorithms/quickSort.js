@@ -15,16 +15,16 @@ function quickSort(low,high,array)
   //Checking If low is less than High or not
   if(low < high)
   {
-    // Make partation in which on left side all the smaller elemnts of partation and on the right hand side all the greater elements
-    let j = partation(low,high,array);
-    // Divinding the array with pivote taken as a partation
+    // Make partition in which on left side all the smaller elemnts of partition and on the right hand side all the greater elements
+    let j = partition(low,high,array);
+    // Divinding the array with pivote taken as a partition
     quickSort(low,j,array);
     quickSort(j+1,high,array);
   }
   return array;
 }
 
-function partation(low,high,unsortedArray)
+function partition(low,high,unsortedArray)
 {
   let pivote = unsortedArray[low];
   animations.push(["pivoton",low]);

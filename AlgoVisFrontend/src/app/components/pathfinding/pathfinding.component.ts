@@ -29,6 +29,9 @@ export class PathfindingComponent implements OnInit {
   seedSave = '';
   startNodeColor = "green";
   endNodeColor = "red";
+  pathfindingNodeGreen = "#00946a";
+  pathfindingNodeBlue = "#004cc4";
+  pathfindingNodeSolution = "#AF4C4C";
   animationDelay = 0;
   nodeColor = "#909090";
   lineWidth = 0.05;
@@ -429,9 +432,9 @@ export class PathfindingComponent implements OnInit {
         console.log("Done!");
         //draw path
         for (let i = path.length - 1; i >= 0; i--) {
-          this.ctxGrid.fillStyle = "YELLOW";
+          this.ctxGrid.fillStyle = this.pathfindingNodeSolution;
           this.ctxGrid.lineWidth = this.lineWidth;
-          this.drawNode(path[i].x, path[i].y, "YELLOW")
+          this.drawNode(path[i].x, path[i].y, this.pathfindingNodeSolution)
           await new Promise<void>(resolve =>
             setTimeout(() => {
               resolve();
@@ -481,12 +484,12 @@ export class PathfindingComponent implements OnInit {
           this.ctxGrid.fillStyle = this.startNodeColor;
           this.ctxGrid.fillRect(this.nodes[this.startNodePositionX][this.startNodePositionY].x + 0.5, this.nodes[this.startNodePositionX][this.startNodePositionY].y + 0.5, this.nodeSize - 1, this.nodeSize - 1);
         }else {
-          this.ctxGrid.fillStyle = "#4287f5";
+          this.ctxGrid.fillStyle = this.pathfindingNodeBlue;
           this.ctxGrid.fillRect(closedSet[i].x + 0.5, closedSet[i].y + 0.5, this.nodeSize - 1, this.nodeSize - 1);
         }
       }
       for (let i = 0; i < openSet.length; i++) {
-        this.ctxGrid.fillStyle = "#00c48d";
+        this.ctxGrid.fillStyle = this.pathfindingNodeGreen;
         this.ctxGrid.fillRect(openSet[i].x + 0.5, openSet[i].y + 0.5, this.nodeSize - 1, this.nodeSize - 1);
 
       }
@@ -557,9 +560,9 @@ export class PathfindingComponent implements OnInit {
         console.log("Done!"); // DONE
         //draw path
         for (let i = path.length - 1; i >= 0; i--) {
-          this.ctxGrid.fillStyle = "#ffff00";
+          this.ctxGrid.fillStyle = this.pathfindingNodeSolution;
           this.ctxGrid.lineWidth = this.lineWidth;
-          this.drawNode(path[i].x, path[i].y, "#ffff00")
+          this.drawNode(path[i].x, path[i].y, this.pathfindingNodeSolution)
           await new Promise<void>(resolve =>
             setTimeout(() => {
               resolve();
@@ -605,12 +608,12 @@ export class PathfindingComponent implements OnInit {
       //draw
       this.ctxGrid.lineWidth = this.lineWidth;
       for (let i = 0; i < closedSet.length; i++) { //BLUE
-        this.ctxGrid.fillStyle = "#4287f5";
+        this.ctxGrid.fillStyle = this.pathfindingNodeBlue;
         this.ctxGrid.fillRect(closedSet[i].x + 0.5, closedSet[i].y + 0.5, this.nodeSize - 1, this.nodeSize - 1);
         //this.drawNode(closedSet[i].x, closedSet[i].y, "#4287f5");
       }
       for (let i = 0; i < openSet.length; i++) { //GREEN
-        this.ctxGrid.fillStyle = "#00c48d";
+        this.ctxGrid.fillStyle = this.pathfindingNodeGreen;
         this.ctxGrid.fillRect(openSet[i].x + 0.5, openSet[i].y + 0.5, this.nodeSize - 1, this.nodeSize - 1);
         //this.drawNode(closedSet[i].x, closedSet[i].y, "#00c48d");
 
@@ -660,9 +663,9 @@ export class PathfindingComponent implements OnInit {
           path.push(current);
         }
         for (let i = path.length - 1; i >= 0; i--) {
-          this.ctxGrid.fillStyle = "#ffff00";
+          this.ctxGrid.fillStyle = this.pathfindingNodeSolution;
           this.ctxGrid.lineWidth = this.lineWidth;
-          this.drawNode(path[i].x, path[i].y, "#ffff00")
+          this.drawNode(path[i].x, path[i].y, this.pathfindingNodeSolution)
           await new Promise<void>(resolve =>
             setTimeout(() => {
               resolve();
@@ -680,7 +683,7 @@ export class PathfindingComponent implements OnInit {
           neighbors[i].visited = true;
           neighbors[i].cameFrom = node;
           queue.enqueue(neighbors[i]);
-          this.ctxGrid.fillStyle = "#4287f5";
+          this.ctxGrid.fillStyle = this.pathfindingNodeBlue;
           this.ctxGrid.fillRect(neighbors[i].x + 0.5, neighbors[i].y + 0.5, this.nodeSize - 1, this.nodeSize - 1);
         }
       }
